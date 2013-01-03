@@ -7,7 +7,7 @@ class ActionDispatch::IntegrationTest
 
   def create_user(options={})
     @user ||= begin
-      user = User.create!(
+      user = (options[:class] || User).create!(
         :username => 'usertest',
         :email => options[:email] || 'user@test.com',
         :password => options[:password] || '12345678',

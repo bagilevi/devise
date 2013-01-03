@@ -202,4 +202,26 @@ class RecoverableTest < ActiveSupport::TestCase
       :reset_password_token
     ]
   end
+
+  test 'should accept a request object, which may be used by overridden methods' do
+    CustomUser = Class.new(User)
+    CustomUser.class_eval do
+      class << self
+        attr_accessor :options_passed_to_reset_password
+      end
+      def reset_password!(new_password, new_password_confirmation, options = nil)
+        self.class.options_passed_to_reset_password = options
+        super
+      end
+    end
+
+    user = create_user(:class => CustomUser)
+    user.send :generate_reset_password_token!
+
+    reset_password_user = CustomUser.reset_password_by_token(
+      { :reset_password_token => user.reset_password_token },
+      { :request => request_stub = stub('request') }
+    )
+    assert_equal request_stub, CustomUser.options_passed_to_reset_password[:request]
+  end
 end

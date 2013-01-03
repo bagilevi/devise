@@ -34,7 +34,8 @@ class ActiveSupport::TestCase
   end
 
   def create_user(attributes={})
-    User.create!(valid_attributes(attributes))
+    klass = attributes.delete(:class)
+    (klass || User).create!(valid_attributes(attributes))
   end
 
   def create_admin(attributes={})
